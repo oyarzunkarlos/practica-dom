@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica DOM - Buscador</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #2c3e50; }
+        /* Estilos para el input de búsqueda */
+        #buscador {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* Para que el padding no rompa el ancho */
+        }
+        #buscador:focus { border-color: #3498db; outline: none; }
+        
+        ul { list-style: none; padding: 0; }
+        li {
+            background: #f8f9fa; border: 1px solid #ddd;
+            margin-bottom: 10px; padding: 15px;
+            border-radius: 5px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .precio { font-weight: bold; color: #27ae60; }
+        button {
+            background: #3498db; color: white; border: none;
+            padding: 8px 15px; border-radius: 4px; cursor: pointer;
+        }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <h1>👟 Catálogo de Calzados</h1>
+    
+    <!-- NUEVO: Input de búsqueda -->
+    <input type="text" id="buscador" placeholder="Escribe para buscar (ej: zapato, 42)...">
+
+    <div id="catalogo-container">
+        <p>Cargando...</p>
+    </div>
+
+    <script>
+        // 1. DATOS
+        const catalogo = [
+            { id: 1, nombre: "Zapato de Seguridad", talle: 42, precio: 45000 },
+            { id: 2, nombre: "Zapatilla Urbana", talle: 39, precio: 29990 },
+            { id: 3, nombre: "Botín Ortopédico", talle: 41, precio: 55000 },
+            { id: 4, nombre: "Sandalia Cómoda", talle: 37, precio: 15000 },
+            { id: 5, nombre: "Zapato de Cuero", talle: 44, precio: 60000 }
+        ];
+
+        // 2. SELECCIONAR ELEMENTOS DEL DOM
+        const contenedor = document.getElementById('catalogo-container');
+        const inputBuscador = document.getElementById('buscador'); // NUEVO: Capturamos el input
+
+        // 3. FUNCIÓN PARA DIBUJAR (RENDERIZAR)
+        function renderizarCatalogo(lista) {
+            contenedor.innerHTML = ''; // Limpiar contenido anterior
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = '<p>No se encontraron productos.</p>';
+                return;
+            }
+
+            const listaUL = document.createElement('ul');
+            
+            lista.forEach(producto => {
+                const itemLI = document.createElement('li');
+                itemLI.innerHTML = `
+                    <span><strong>${producto.nombre}</strong> (Talle: ${producto.talle})</span>
+                    <span class="precio">$${producto.precio.toLocaleString()}</span>
+                    <button onclick="alert('Agregaste: ${producto.nombre}')">Agregar</button>
+                `;
+                listaUL.appendChild(itemLI);
+            });
+
+            contenedor.appendChild(listaUL);
+        }
+
+        // 4. NUEVO: LÓGICA DEL FILTRO
+        inputBuscador.addEventListener('input', (evento) => {
+            const texto = evento.target.value.toLowerCase(); // Lo que escribes
+            
+            // Filtramos el array original
+            const productosFiltrados = catalogo.filter(producto => {
+            // Buscamos si el nombre o el talle (convertido a string) incluyen el texto
+                return producto.nombre.toLowerCase().includes(texto) || 
+                       producto.talle.toString().includes(texto);
+            });
+
+            // Volvemos a dibujar con la lista filtrada
+            renderizarCatalogo(productosFiltrados);
+        });
+
+        // 5. DIBUJAR INICIAL
+        renderizarCatalogo(catalogo);
+    </script>
+</body>
+</html>
+*/

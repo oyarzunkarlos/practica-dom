@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda Dinámica - Reparadora</title>
+    <style>
+        /* Estilos básicos para que se vea bien */
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Grid de productos */
+        #grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* Tarjeta de producto */
+        .producto-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .producto-card h3 { font-size: 1rem; margin: 10px 0; }
+        .precio { color: #27ae60; font-weight: bold; font-size: 1.2rem; }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover { background: #2980b9; }
+
+        /* Carrito */
+        #carrito-lista {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        #carrito-lista ul { list-style: none; padding: 0; }
+        #carrito-lista li { border-bottom: 1px solid #eee; padding: 5px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Reparadora de Calzados</h1>
+    
+    <!-- Aquí se inyectarán los productos automáticamente -->
+    <div id="grid-productos">Cargando productos...</div>
+
+    <div id="carrito-lista">
+        <h2>🛒 Carrito</h2>
+        <ul id="lista-carrito"></ul>
+        <p>Total: $<span id="total-precio">0</span></p>
+    </div>
+</div>
+
+<script>
+    // 1. TUS DATOS (Simulando base de datos)
+    const productos = [
+        { id: 1, nombre: "Zapatillas Urbanas", precio: 50000 },
+        { id: 2, nombre: "Botas de Seguridad", precio: 80000 },
+        { id: 3, nombre: "Sandalias Verano", precio: 30000 },
+        { id: 4, nombre: "Mocasines Cuero", precio: 45000 },
+        { id: 5, nombre: "Botines Trekking", precio: 95000 }
+    ];
+
+    let carrito = [];
+
+    // 2. FUNCIÓN PRINCIPAL: Generar la tienda
+    function renderizarTienda() {
+        const contenedor = document.getElementById('grid-productos');
+        contenedor.innerHTML = ''; // Limpiar
+
+        // ¡AQUÍ ESTÁ LA MAGIA DEL FOR!
+        for (let i = 0; i < productos.length; i++) {
+            const prod = productos[i]; // Obtenemos el objeto real
+
+            // Creamos el HTML de la tarjeta
+            const tarjetaHTML = `
+                <div class="producto-card">
+                    <h3>${prod.nombre}</h3>
+                    <p class="precio">$${prod.precio}</p>
+                    <!-- Ojo: pasamos el ID real, no el índice i -->
+                    <button onclick="agregarAlCarrito(${prod.id})">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            `;
+            
+            // Lo agregamos al contenedor
+            contenedor.innerHTML += tarjetaHTML;
+        }
+    }
+
+    // 3. TU FUNCIÓN DE AGREGAR (La misma de antes)
+    function agregarAlCarrito(idProducto) {
+        // Buscamos el producto real usando su ID (no el índice)
+        const productoEncontrado = productos.find(p => p.id === idProducto);
+
+        if (productoEncontrado) {
+            carrito.push(productoEncontrado);
+renderizarCarrito();
+            console.log(`Agregado: ${productoEncontrado.nombre}`);
+        } else {
+            console.error("Producto no encontrado con ID:", idProducto);
+        }
+    }
+
+    // 4. Renderizar el carrito
+    function renderizarCarrito() {
+        const lista = document.getElementById('lista-carrito');
+        const totalSpan = document.getElementById('total-precio');
+        lista.innerHTML = '';
+        
+        let total = 0;
+
+        carrito.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre} - $${item.precio}`;
+            lista.appendChild(li);
+            total += item.precio;
+        });
+
+        totalSpan.textContent = total;
+    }
+
+    // 5. Inicializar al cargar
+    renderizarTienda();
+
+</script>
+
+</body>
+</html>

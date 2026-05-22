@@ -1,0 +1,22 @@
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Grid y Tarjetas (Igual que antes) */
+        #grid-productos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .producto-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .precio { color: #27ae60; font-weight: bold; font-size: 1.2rem; }
+        
+        /* Botones */
+        button { background: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%; transition: all 0.3s; }
+        button:hover { background: #2980b9; }
+        button.agregado { background-color: #27ae60 !important; transform: scale(0.95); }
+        button.btn-eliminar { background: #e74c3c; width: auto; padding: 5px 10px; font-size: 0.8rem; margin-left: 10px; }
+        button.btn-eliminar:hover { background: #c0392b; }
+
+        /* Carrito Mejorado */
+        #carrito-lista { background: white; padding: 20px; border-radius: 8px; }
+        .carrito-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .carrito-info { flex-grow: 1; }
+        .carrito-cantidad { font-weight: bold; color: #7f8c8d; margin: 0 10px; }
+        .carrito-subtotal { font-weight: bold; color: #2c3e50; }
+        .carrito-vacio { text-align: center; color: #95a5a6; font-style: italic; }

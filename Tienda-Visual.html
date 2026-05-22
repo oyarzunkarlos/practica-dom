@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda con Feedback Visual</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Grid */
+        #grid-productos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+        }
+
+        /* Tarjeta */
+        .producto-card { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            text-align: center; 
+        }
+        .precio { color: #27ae60; font-weight: bold; font-size: 1.2rem; }
+
+        /* Botón Base */
+        button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            width: 100%;
+            transition: all 0.3s ease; /* Suaviza el cambio de color */
+        }
+        button:hover { background: #2980b9; }
+
+        /* 👈 NUEVA CLASE: Estado "Agregado" */
+        button.agregado {
+            background-color: #27ae60 !important; /* Verde */
+            transform: scale(0.95); /* Pequeña reducción */
+        }
+
+        /* Carrito */
+        #carrito-lista { background: white; padding: 20px; border-radius: 8px; }
+        #carrito-lista ul { list-style: none; padding: 0; }
+        #carrito-lista li { border-bottom: 1px solid #eee; padding: 5px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Reparadora de Calzados</h1>
+    <div id="grid-productos">Cargando...</div>
+    
+    <div id="carrito-lista">
+        <h2>🛒 Carrito</h2>
+        <ul id="lista-carrito"></ul>
+        <p>Total: $<span id="total-precio">0</span></p>
+    </div>
+</div>
+
+<script>
+    const productos = [
+        { id: 1, nombre: "Zapatillas Urbanas", precio: 50000 },
+        { id: 2, nombre: "Botas Seguridad", precio: 80000 },
+        { id: 3, nombre: "Sandalias Verano", precio: 30000 },
+        { id: 4, nombre: "Mocasines Cuero", precio: 45000 },
+        { id: 5, nombre: "Botines Trekking", precio: 95000 }
+    ];
+
+    let carrito = [];
+
+    function renderizarTienda() {
+        const contenedor = document.getElementById('grid-productos');
+        contenedor.innerHTML = '';
+
+        for (let i = 0; i < productos.length; i++) {
+            const prod = productos[i];
+            // 👈 OJO AQUÍ: Pasamos 'this' (el botón mismo) a la función
+            const tarjetaHTML = `
+                <div class="producto-card">
+                    <h3>${prod.nombre}</h3>
+                    <p class="precio">$${prod.precio}</p>
+                    <button onclick="agregarAlCarrito(${prod.id}, this)">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            `;
+            contenedor.innerHTML += tarjetaHTML;
+        }
+    }
+
+// 1. Objeto para guardar el estado de CADA botón individualmente
+// Usamos el ID del producto como clave: { 1: true, 2: false, ... }
+const estadosBotones = {}; 
+
+function agregarAlCarrito(idProducto, botonElemento) {
+    // --- BLOQUEO DE SEGURIDAD ---
+    // Si este botón específico ya está en proceso (verde), ignoramos el click.
+    // Esto evita que se reinicie el timer y se rompa el texto.
+    if (estadosBotones[idProducto]) {
+        return; 
+    }
+    // ----------------------------
+
+    const productoEncontrado = productos.find(p => p.id === idProducto);
+
+    if (productoEncontrado) {
+        // Marcar como "Ocupado/Verde"
+        estadosBotones[idProducto] = true;
+
+        carrito.push(productoEncontrado);
+        renderizarCarrito();
+
+        // Guardar el texto original AHORA, cuando sabemos que es seguro
+        const textoOriginal = "Agregar al Carrito"; // O botonElemento.innerText si cambiara dinámicamente
+        
+        // Aplicar cambios visuales
+        botonElemento.classList.add('agregado');
+        botonElemento.innerText = "¡Agregado!";
+
+        // Programar la vuelta a la normalidad
+        setTimeout(() => {
+            botonElemento.classList.remove('agregado');
+            botonElemento.innerText = textoOriginal;
+            
+            // Liberar el bloqueo para este botón
+            estadosBotones[idProducto] = false;
+        }, 1000);
+
+        console.log(`Agregado ID ${idProducto}`);
+    }
+}
+
+    function renderizarCarrito() {
+        const lista = document.getElementById('lista-carrito');
+        const totalSpan = document.getElementById('total-precio');
+        lista.innerHTML = '';
+        let total = 0;
+        carrito.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre} - $${item.precio}`;
+            lista.appendChild(li);
+            total += item.precio;
+        });
+        totalSpan.textContent = total;
+    }
+
+    renderizarTienda();
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda Profesional - Persistente y Agrupada</title>
+    <link rel="stylesheet" href="stylesTP.css">
+</head>
+<body>
+<div class="container">
+    <h1>Reparadora de Calzados</h1>
+    <div id="grid-productos">Cargando...</div>
+    
+    <div id="carrito-lista">
+        <h2>🛒 Tu Carrito</h2>
+        <div id="lista-carrito-items"></div>
+        <p>Total: $<span id="total-precio">0</span></p>
+        <button onclick="vaciarCarrito()" style="background:#7f8c8d; margin-top:10px;">Vaciar Carrito</button>
+    </div>
+</div>
+
+<script>
+    // 1. DATOS (Simulando DB)
+    const productos = [
+        { id: 1, nombre: "Zapatillas Urbanas", precio: 50000 },
+        { id: 2, nombre: "Botas Seguridad", precio: 80000 },
+        { id: 3, nombre: "Sandalias Verano", precio: 30000 },
+        { id: 4, nombre: "Mocasines Cuero", precio: 45000 },
+        { id: 5, nombre: "Botines Trekking", precio: 95000 }
+    ];
+
+    // 2. ESTADO INICIAL (Cargar desde LocalStorage o vacío)
+    let carrito = JSON.parse(localStorage.getItem('mi_carrito_reparadora')) || [];
+
+    // 3. GENERAR TIENDA (Igual que antes)
+    function renderizarTienda() {
+        const contenedor = document.getElementById('grid-productos');
+        contenedor.innerHTML = '';
+        for (let i = 0; i < productos.length; i++) {
+            const prod = productos[i];
+            contenedor.innerHTML += `
+                <div class="producto-card">
+                    <h3>${prod.nombre}</h3>
+                    <p class="precio">$${prod.precio.toLocaleString()}</p>
+                    <button onclick="agregarAlCarrito(${prod.id}, this)">Agregar al Carrito</button>
+                </div>`;
+        }
+    }
+
+// 4. LÓGICA INTELIGENTE DE AGREGAR
+    function agregarAlCarrito(idProducto, botonElemento) {
+        // --- Feedback Visual (Igual que antes) ---
+        if (botonElemento.classList.contains('agregado')) return;
+        botonElemento.classList.add('agregado');
+        const textoOriginal = botonElemento.innerText;
+        botonElemento.innerText = "¡Agregado!";
+        setTimeout(() => {
+            botonElemento.classList.remove('agregado');
+            botonElemento.innerText = textoOriginal;
+        }, 1000);
+
+        // --- Lógica de Agrupación ---
+        const existe = carrito.find(item => item.id === idProducto);
+        
+        if (existe) {
+            existe.cantidad++; // Si ya existe, sumamos 1
+        } else {
+            // Si no existe, buscamos los datos completos y creamos el item
+            const prodDB = productos.find(p => p.id === idProducto);
+            carrito.push({ ...prodDB, cantidad: 1 });
+        }
+
+        guardarYRenderizar(); // Guardar y actualizar vista
+    }
+
+    // 5. ELIMINAR (Quita 1 unidad o elimina si es 1)
+    function reducirOCerrar(idProducto) {
+        const item = carrito.find(item => item.id === idProducto);
+        if (item) {
+            if (item.cantidad > 1) {
+                item.cantidad--;
+            } else {
+                carrito = carrito.filter(item => item.id !== idProducto);
+            }
+            guardarYRenderizar();
+        }
+    }
+
+    // 6. VACiar TODO
+    function vaciarCarrito() {
+        if(confirm('¿Seguro que quieres vaciar el carrito?')) {
+            carrito = [];
+            guardarYRenderizar();
+        }
+    }
+
+    // 7. GUARDAR EN NAVEGADOR
+    function guardarYRenderizar() {
+        localStorage.setItem('mi_carrito_reparadora', JSON.stringify(carrito));
+        renderizarCarrito();
+    }
+
+    // 8. RENDERIZAR CARRITO (Ahora con cantidades y botones)
+    function renderizarCarrito() {
+        const contenedor = document.getElementById('lista-carrito-items');
+        const totalSpan = document.getElementById('total-precio');
+        contenedor.innerHTML = '';
+        
+        let total = 0;
+
+        if (carrito.length === 0) {
+            contenedor.innerHTML = '<p class="carrito-vacio">El carrito está vacío</p>';
+        } else {
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                
+                contenedor.innerHTML += `
+                    <div class="carrito-item">
+                        <div class="carrito-info">
+                            <strong>${item.nombre}</strong><br>
+                            <small>P. Unit: $${item.precio.toLocaleString()}</small>
+                        </div>
+                        <div>
+                            <span class="carrito-cantidad">${item.cantidad} x</span>
+                            <span class="carrito-subtotal">$${subtotal.toLocaleString()}</span>
+                            <button class="btn-eliminar" onclick="reducirOCerrar(${item.id})">
+                                ${item.cantidad > 1 ? '-' : '🗑️'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        totalSpan.textContent = total.toLocaleString();
+    }
+
+    // Inicializar
+    renderizarTienda();
+    renderizarCarrito(); // Cargar carrito guardado al inicio
+
+</script>
+</body>
+</html>
